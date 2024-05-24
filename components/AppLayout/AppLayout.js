@@ -43,7 +43,7 @@ export const AppLayout = ({ children }) => {
                     </> : <Link href='/api/auth/login'>Login</Link>}
                 </div>
             </div>
-            <div>{children}</div>
+            {children}
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0'
-import { AppLayout } from '../../components/AppLayout';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { AppLayout } from '../../components/AppLayout';
 
 export default function NewPost(props) {
   const router = useRouter()
@@ -13,18 +13,22 @@ export default function NewPost(props) {
     e.preventDefault()
     setIsStartGenerator(true)
 
-    const response = await fetch('/api/generatePost', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({ topic, keywords })
-    })
+    try {
+      const response = await fetch('/api/generatePost', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ topic, keywords })
+      })
 
-    const message = await response.json()
+      const message = await response.json()
 
-    if (message.postId) { 
-      router.push(`/post/${message.postId}`)
+      if (message?.postId) {
+        router.push(`/post/${message.postId}`)
+        setIsStartGenerator(false)
+      }
+    } catch (e) {
       setIsStartGenerator(false)
     }
   }
