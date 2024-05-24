@@ -1,10 +1,11 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0'
 import { AppLayout } from '../../components/AppLayout';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function NewPost(props) {
+  const router = useRouter()
   const [isStartGenerator, setIsStartGenerator] = useState(false)
-  const [postContent, setPostContent] = useState('')
   const [topic, setTopic] = useState('')
   const [keywords, setKeywords] = useState('')
 
@@ -22,8 +23,8 @@ export default function NewPost(props) {
 
     const message = await response.json()
 
-    if (message[0].generated_text.length) {
-      setPostContent(message[0].generated_text)
+    if (message.postId) { 
+      router.push(`/post/${message.postId}`)
       setIsStartGenerator(false)
     }
   }
@@ -58,10 +59,8 @@ export default function NewPost(props) {
               <span className='flex justify-center items-center'>Generate</span>
             }
           </button>
-
         </form>
       </div>
-      <div>{postContent}</div>
     </div>
   )
 }
