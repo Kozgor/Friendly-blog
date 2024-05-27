@@ -1,8 +1,8 @@
+import { getAppProps } from '../../utils/getAppProps'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { withPageAuthRequired } from '@auth0/nextjs-auth0'
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { AppLayout } from '../../components/AppLayout';
-import { getAppProps } from '../../utils/getAppProps';
+import { AppLayout } from '../../components/AppLayout'
 
 export default function NewPost(props) {
   const router = useRouter()
@@ -25,8 +25,8 @@ export default function NewPost(props) {
 
       const message = await response.json()
 
-      if (message?.postId) {
-        router.push(`/post/${message.postId}`)
+      if (message?.postid) {
+        router.push(`/post/${message.postid}`)
         setIsStartGenerator(false)
       }
     } catch (e) {
@@ -35,13 +35,14 @@ export default function NewPost(props) {
   }
 
   return (
-    <div>
-      <div>
-        <form onSubmit={handleSubmit}>
+    <div className='h-full overflow-hidden'>
+      <div className='w-full h-full flex flex-col overflow-auto '>
+        <form className='m-auto w-full max-w-screen-sm bg-slate-100 p-4 rounded-md shadow-xl border border-color-slate-200 shadow-slate-200' onSubmit={handleSubmit}>
           <div>
             <label><strong>Generate a blog post on the topic of:</strong></label>
             <textarea
               value={topic}
+              maxLength={40}
               onChange={e => setTopic(e.target.value)}
               className='resize-none border-slate-500 w-full block my-2 px-4 py-2 rounded-sm'
             ></textarea>
@@ -50,12 +51,14 @@ export default function NewPost(props) {
             <label><strong>Targeting the folowing keywords:</strong></label>
             <textarea
               value={keywords}
+              maxLength={40}
               onChange={e => setKeywords((e.target.value))}
               className='resize-none border-slate-500 w-full block my-2 px-4 py-2 rounded-sm'
             ></textarea>
+            <small className='block mb-2'>Separate words with a comma</small>
           </div>
 
-          <button type='submit' className='btn'>
+          <button disabled={!topic.trim() || isStartGenerator} type='submit' className='btn'>
             {isStartGenerator ?
               <span className='flex justify-center items-center'>Procesing...<svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 ml-1 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB" />
@@ -76,8 +79,15 @@ NewPost.getLayout = function getLayout(page, pageProps) {
 
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(ctx) {
-    const props= await getAppProps(ctx)
-
+    const props = await getAppProps(ctx)
+    if (!props.availableTokens) {
+      return {
+        redirect: {
+          destination: '/token-topup',
+          permanent: false
+        }
+      }
+    }
     return {
       props
     }
