@@ -20,5 +20,5 @@ export default async function handler(req, res) {
             upsert: true
         })
 
-    res.status(200).json({ userProfile })
+    return res.status(200).json({ userProfile })
 }

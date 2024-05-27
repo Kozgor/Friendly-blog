@@ -1,5 +1,5 @@
-import { pipeline } from '@xenova/transformers'
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0'
+import { pipeline } from '@xenova/transformers'
 import clientPromise from '../../lib/mongodb'
 
 export default withApiAuthRequired(async function handler(req, res) {
@@ -15,6 +15,12 @@ export default withApiAuthRequired(async function handler(req, res) {
     }
 
     const { topic, keywords } = req.body
+
+    if (!topic || topic.length >80) {
+        res.status(422)
+        return
+    }
+
     const userRequest = keywords ? `${topic} with ${keywords}` : `${topic}`
     const generator = await pipeline('text2text-generation', 'Xenova/flan-alpaca-base')
     const generatedResponse = await generator(userRequest, { max_length: 512, do_sample: true, top_k: 10, })
@@ -36,9 +42,9 @@ export default withApiAuthRequired(async function handler(req, res) {
         userId: userProfile._id,
         created: new Date()
     })
-    
-    res.status(200).json({
-        postId: postRequest.insertedId,
+
+    return res.status(200).json({
+        postid: postRequest.insertedId,
         topic: postRequest.topic,
         keywords: postRequest.keywords,
     })

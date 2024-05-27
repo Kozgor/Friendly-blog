@@ -1,6 +1,11 @@
 import '../styles/globals.css'
-import { UserProvider } from '@auth0/nextjs-auth0/client'
+import '@fortawesome/fontawesome-svg-core/styles.css'
 import { DM_Sans, DM_Serif_Display } from '@next/font/google'
+import { config } from '@fortawesome/fontawesome-svg-core'
+import { PostProvider } from '../context/postsContext'
+import { UserProvider } from '@auth0/nextjs-auth0/client'
+
+config.autoAddCss = false
 
 const dmSans = DM_Sans({
   weight: ['400', '500', '700'],
@@ -19,9 +24,11 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <UserProvider>
-      <main className={`${dmSans.variable} ${dmSarif.variable} font-body`}>
-        {getLayout(<Component {...pageProps} />, pageProps)}
-      </main>
+      <PostProvider>
+        <main className={`${dmSans.variable} ${dmSarif.variable} font-body`}>
+          {getLayout(<Component {...pageProps} />, pageProps)}
+        </main>
+      </PostProvider>
     </UserProvider>
   )
 }
